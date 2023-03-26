@@ -11,6 +11,11 @@ data class Movie(
     val images: List<String>,
     val rating: String)
 
+fun getMovieByID (movieID: String?) : Movie? {
+    val movieFilter = getMovies().filter { it.id == movieID }
+    return if (movieFilter.isNotEmpty()) movieFilter[0] else null
+}
+
 fun getMovies(): List<Movie> {
     return listOf(
         Movie(id = "tt0499549",
