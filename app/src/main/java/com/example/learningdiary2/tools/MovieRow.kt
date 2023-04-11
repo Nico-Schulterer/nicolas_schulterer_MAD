@@ -11,6 +11,7 @@ import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.runtime.*
@@ -27,7 +28,7 @@ import com.example.learningdiary2.models.Movie
 import com.example.lectureexamples.R
 
 @Composable
-fun MovieRow(movie: Movie, onItemClick: (String) -> Unit) {
+fun MovieRow(movie: Movie, onImageClick: (String) -> Unit, onFavoriteClick: () -> Movie) {
 
     var expanded by remember {
         mutableStateOf(false)
@@ -35,6 +36,13 @@ fun MovieRow(movie: Movie, onItemClick: (String) -> Unit) {
 
     val rotationState by animateFloatAsState(targetValue = if (expanded) -180f else 0f)
 
+    var isFavorite by remember {
+        mutableStateOf(movie.isFavorite)
+    }
+
+    var _movie by remember {
+        mutableStateOf(movie)
+    }
 
     Card(modifier = Modifier
         .fillMaxWidth()
@@ -47,7 +55,7 @@ fun MovieRow(movie: Movie, onItemClick: (String) -> Unit) {
             Box(modifier = Modifier
                 .height(150.dp)
                 .fillMaxWidth()
-                .clickable {onItemClick(movie.id)}
+                .clickable { onImageClick(movie.id) }
             ) {
                 val painter = rememberAsyncImagePainter(
                     ImageRequest.Builder(LocalContext.current).data(data = if (movie.images.isNotEmpty()) movie.images[0] else R.drawable.imageerror)
@@ -69,11 +77,16 @@ fun MovieRow(movie: Movie, onItemClick: (String) -> Unit) {
                         .padding(10.dp),
                     contentAlignment = Alignment.TopEnd
                 ) {
-                    Icon(
-                        tint = MaterialTheme.colors.secondary,
-                        imageVector = Icons.Default.FavoriteBorder,
-                        contentDescription = "Add to favorites"
-                    )
+                    IconButton(onClick = {
+                        _movie = onFavoriteClick()
+                        isFavorite = _movie.isFavorite
+                    }) {
+                        Icon (
+                            tint = if (_movie.id == movie.id) (if (isFavorite) Color.Red else MaterialTheme.colors.secondary) else Color.Red,
+                            imageVector = if (_movie.id == movie.id) (if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder) else Icons.Default.Favorite,
+                            contentDescription = "Add to favorites"
+                        )
+                    }
                 }
             }
 
